@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TwinSEN | A Planta Digital</title>
+    <style>
+      :root {
+        --cor-fundo: #f4f7f9; --cor-container: #ffffff; --cor-texto-principal: #2c3e50;
+        --cor-texto-secundario: #5a738b; --cor-borda: #dee7f0; --sombra: 0 8px 24px rgba(21, 48, 71, 0.08);
+        --cor-primaria: #3498db; --cor-sucesso: #2ecc71; --cor-aviso: #f1c40f; --cor-perigo: #e74c3c;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: sans-serif; background-color: var(--cor-fundo); color: var(--cor-texto-principal); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+      .site-header { width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; text-align: center; background: linear-gradient(to right, #2c3e50, #34495e); padding: 25px 20px; border-radius: 12px; box-shadow: var(--sombra); }
+      .logo { max-height: 60px; margin-bottom: 15px; }
+      .site-header h1 { font-size: 2em; font-weight: 700; color: #ffffff; }
+      .panel { background-color: var(--cor-container); border: 1px solid var(--cor-borda); border-radius: 12px; padding: 25px; box-shadow: var(--sombra); display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 800px; }
+      #planta-container { width: 100%; max-width: 300px; height: 300px; margin-bottom: 20px; }
+      #planta-container img { width: 100%; height: 100%; object-fit: contain; transition: opacity 0.3s ease-in-out; }
+      .latest-value-display { background-color: #f8f9fa; border: 1px solid var(--cor-borda); border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 25px; width: 100%; max-width: 400px; }
+      .latest-value-display p { font-size: 1.1em; color: var(--cor-texto-secundario); margin-bottom: 10px; }
+      .latest-value-display span { font-size: 2.8em; font-weight: 700; color: var(--cor-sucesso); }
+      .instructions { color: var(--cor-texto-secundario); font-size: 1.1em; line-height: 1.6; max-width: 600px; }
+      .instructions strong { color: var(--cor-primaria); }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <img src="{{ url_for('static', filename='logo_wisstek.png') }}" alt="Logotipo Wisstek" class="logo">
+        <h1>TwinSEN | A Planta Digital Misteriosa</h1>
+    </header>
+    <main class="panel">
+        <div class="latest-value-display">
+            <p>Luminosidade Atual do Ambiente</p>
+            <span id="valor-luz">--</span>
+        </div>
+
+        <div id="planta-container">
+            <img id="imagem-planta" src="{{ url_for('static', filename='planta_neutra.png') }}" alt="Estado da planta">
+        </div>
+        
+        <p class="instructions">
+            Sua missão é ajudar seus colegas a <strong>descobrirem os limiares secretos</strong> desta planta! 
+            Diga a eles se ela está <strong>FELIZ</strong>, <strong>NEUTRA</strong> ou <strong>TRISTE</strong>.
+        </p>
+    </main>
+
+    <script>
+        let estadoAtualPlanta = 'neutra';
+        const imgPlanta = document.getElementById('imagem-planta');
+        const spanLuz = document.getElementById('valor-luz');
+
+        async function atualizarPlanta() {
+            try {
+                const responseLuz = await fetch('/api/luminosidade');
+                const dataLuz = await responseLuz.json();
+                const ultimaLuminosidade = dataLuz.latest_value !== "N/A" ? parseFloat(dataLuz.latest_value).toFixed(0) : "N/A";
+                spanLuz.textContent = ultimaLuminosidade;
+
+                if (ultimaLuminosidade === "N/A") return;
+
+                const responseEstado = await fetch(`/api/estado_planta?luminosidade=${ultimaLuminosidade}`);
+                const dataEstado = await responseEstado.json();
+                const novoEstado = dataEstado.estado_planta;
+
+                if (novoEstado !== estadoAtualPlanta) {
+                    estadoAtualPlanta = novoEstado;
+                    imgPlanta.style.opacity = '0';
+                    setTimeout(() => {
+                        imgPlanta.src = `/static/planta_${novoEstado}.png`;
+                        imgPlanta.style.opacity = '1';
+                    }, 300);
+                }
+            } catch (error) {
+                console.error("Erro ao atualizar a planta:", error);
+                spanLuz.textContent = "Erro";
+            }
+        }
+        setInterval(atualizarPlanta, 1000);
+        document.addEventListener('DOMContentLoaded', atualizarPlanta);
+    </script>
+</body>
+</html>

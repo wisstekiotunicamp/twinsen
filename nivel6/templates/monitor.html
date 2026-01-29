@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TwinSEN | Monitor</title>
+    <style>
+      :root {
+        --cor-fundo: #f4f7f9; --cor-container: #ffffff; --cor-texto-principal: #2c3e50;
+        --cor-texto-secundario: #5a738b; --cor-borda: #dee7f0; --sombra: 0 8px 24px rgba(21, 48, 71, 0.08);
+        --cor-primaria: #3498db; --cor-sucesso: #2ecc71; --cor-aviso: #f1c40f; --cor-perigo: #e74c3c;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: sans-serif; background-color: var(--cor-fundo); color: var(--cor-texto-principal); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+      .site-header { width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; text-align: center; background: linear-gradient(to right, #2c3e50, #34495e); padding: 25px 20px; border-radius: 12px; box-shadow: var(--sombra); }
+      .logo { max-height: 60px; margin-bottom: 15px; }
+      .site-header h1 { font-size: 2em; font-weight: 700; color: #ffffff; }
+      .panel { background-color: var(--cor-container); border: 1px solid var(--cor-borda); border-radius: 12px; padding: 25px 35px; box-shadow: var(--sombra); display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 700px; }
+      .panel h2 { font-size: 1.8em; margin-bottom: 20px; color: var(--cor-texto-principal); border-bottom: 2px solid var(--cor-primaria); padding-bottom: 10px; }
+      .secret-info p { font-size: 1.3em; color: var(--cor-texto-secundario); margin: 15px 0; }
+      .secret-info strong { color: var(--cor-perigo); font-size: 1.5em; display: block; margin-top: 5px; }
+      .warning { color: var(--cor-perigo); font-weight: 700; margin-top: 25px; font-size: 1.1em; max-width: 500px; text-align: center; }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <img src="{{ url_for('static', filename='logo_wisstek.png') }}" alt="Logotipo Wisstek" class="logo">
+        <h1>TwinSEN | Backdoor do Monitor</h1>
+    </header>
+    <main class="panel">
+        <h2>Limiares Secretos da Planta</h2>
+        <div class="secret-info">
+            <p>Limiar de Atenção Secreto: <strong>{{ limiar_atencao_secreto }}</strong></p>
+            <p>Limiar Crítico Secreto: <strong>{{ limiar_critico_secreto }}</strong></p>
+        </div>
+        <p class="warning">
+            Estes são os valores que os alunos devem "descobrir". Não mostre esta página para eles!
+        </p>
+    </main>
+</body>
+</html>
